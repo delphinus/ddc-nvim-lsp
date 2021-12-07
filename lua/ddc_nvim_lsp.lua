@@ -20,13 +20,21 @@ local request_candidates = function(arguments, id)
 
   local func = function(responses)
     local all = {}
-    for _, r in ipairs(responses)  do
+    local count = {}
+    for id, r in ipairs(responses)  do
+      local name = vim.lsp.get_client_by_id(id).name
+      local c = 0
       if r.result then
         local items = r.result.items or r.result
+        c = #items
         for i = 1, #items do
           all[#all + 1] = items[i]
         end
       end
+      count[name] = c
+    end
+    if vim.g.ddc_nvim_lsp_debug then
+      print(vim.fn.json_encode{count})
     end
     api.nvim_call_function('ddc#callback', {id, {
       result = all,
